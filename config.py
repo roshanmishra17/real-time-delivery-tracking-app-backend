@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     REDIS_URL : str
     SECRET_KEY : str
-    ALGORIGTHM : str
+    ALGORITHM : str
     ACCESS_TOKEN_TIME : int
 
     class Config :
