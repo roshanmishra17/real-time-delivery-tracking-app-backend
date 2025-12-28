@@ -13,7 +13,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=engine)
 redis_task = None 
 
 
@@ -41,6 +40,14 @@ app.include_router(ws_secure_router.router)
 app.include_router(location.router)
 app.include_router(admin_agents.router)
 app.include_router(admin_stats.router)
+
+@app.on_event("startup")
+def create_tables():
+    try:
+        models.Base.metadata.create_all(bind=engine)
+        print("Tables ensured")
+    except Exception as e:
+        print("Table creation skipped:", e)
 
 
 @app.on_event("startup")
@@ -76,7 +83,11 @@ def create_initial_admin():
 @app.on_event("startup")
 async def startup_event():
     global redis_task
-    redis_task = asyncio.create_task(redis_listener())
+    try:
+        redis_task = asyncio.create_task(redis_listener())
+    except Exception as e:
+        print("Redis listener not started:", e)
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
