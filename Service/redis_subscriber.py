@@ -5,8 +5,15 @@ from ws.manager import manager
 
 
 async def redis_listener():
-    print("Redis listener started")
     redis = await get_redis()
+
+    # ✅ THIS IS THE CRITICAL FIX
+    if not redis:
+        print("Redis disabled — skipping subscriber")
+        return
+
+    print("Redis listener started")
+
     pubsub = redis.pubsub()
     await pubsub.psubscribe("order:*")
 
@@ -17,9 +24,9 @@ async def redis_listener():
                 continue
 
             msg_type = message.get("type")
-            if msg_type not in ("message","pmessage"):
+            if msg_type not in ("message", "pmessage"):
                 continue
-                
+
             channel = message.get("channel")
             data = message.get("data")
 
@@ -35,11 +42,12 @@ async def redis_listener():
                     order_id = int(channel.split(":")[1])
                 except Exception:
                     continue
-            
-            await manager.broadcast_to_order(order_id,payload)
+
+            await manager.broadcast_to_order(order_id, payload)
+
     finally:
         try:
             await pubsub.unsubscribe()
             await pubsub.close()
-        except:
+        except Exception:
             pass

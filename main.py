@@ -70,7 +70,8 @@ def create_initial_admin():
 
 @app.on_event("startup")
 async def startup_event():
-    await get_redis()      # ensures Redis connection is ready
+    if redis_task:
+        redis_task.cancel()
     global redis_task
     redis_task = asyncio.create_task(redis_listener())
 
