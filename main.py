@@ -68,10 +68,10 @@ def create_initial_admin():
     finally:
         db.close()
 
+redis_task = None 
+
 @app.on_event("startup")
 async def startup_event():
-    if redis_task:
-        redis_task.cancel()
     global redis_task
     redis_task = asyncio.create_task(redis_listener())
 
@@ -80,10 +80,6 @@ async def shutdown_event():
     global redis_task
     if redis_task:
         redis_task.cancel()
-        try:
-            await redis_task
-        except asyncio.CancelledError:
-            pass
 
 @app.get('/')
 def test():

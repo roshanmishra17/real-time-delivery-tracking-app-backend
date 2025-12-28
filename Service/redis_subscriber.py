@@ -7,7 +7,6 @@ from ws.manager import manager
 async def redis_listener():
     redis = await get_redis()
 
-    # ✅ THIS IS THE CRITICAL FIX
     if not redis:
         print("Redis disabled — skipping subscriber")
         return
