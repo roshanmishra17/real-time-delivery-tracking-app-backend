@@ -27,7 +27,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://real-time-delivery-tracking-app-fro.vercel.app/"
+        "https://real-time-delivery-tracking-app-fro.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
