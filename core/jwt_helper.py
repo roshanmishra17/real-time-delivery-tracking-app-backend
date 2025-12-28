@@ -4,7 +4,7 @@ from database import SessionLocal
 import models.models as models
 def get_user_from_token(token : str):
     try:
-        payload = jwt.decode(token,settings.SECRET_KEY,algorithms=[settings.ALGORIGTHM])
+        payload = jwt.decode(token,settings.SECRET_KEY,algorithms=[settings.ALGORITHM])
     except JWTError:
         return None
 
