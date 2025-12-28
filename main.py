@@ -14,6 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+redis_task = None 
+
 
 
 origins = [
@@ -68,7 +70,6 @@ def create_initial_admin():
     finally:
         db.close()
 
-redis_task = None 
 
 @app.on_event("startup")
 async def startup_event():
