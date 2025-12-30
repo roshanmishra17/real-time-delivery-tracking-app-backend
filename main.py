@@ -9,6 +9,7 @@ from database import SessionLocal, engine
 from router import agent, auth, location, orders, users,admin_agents,admin_stats
 from utils import hash_pass
 from fastapi.middleware.cors import CORSMiddleware
+from config import settings
 
 
 app = FastAPI()
@@ -60,11 +61,11 @@ def create_initial_admin():
         ).first()
 
         if not admin:
-            hashed_password = hash_pass("roshan123")
+            hashed_password = hash_pass(settings.ADMIN_PASSWORD)
 
             new_admin = models.User(
                 name="Admin",
-                email="roshanway@gmail.com",
+                email=settings.ADMIN_EMAIL,
                 password=hashed_password,
                 role=models.UserRole.admin
             )
