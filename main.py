@@ -10,7 +10,7 @@ from router import agent, auth, location, orders, users,admin_agents,admin_stats
 from utils import hash_pass
 from fastapi.middleware.cors import CORSMiddleware
 from config import settings
-
+import os
 
 app = FastAPI()
 
@@ -50,29 +50,32 @@ def create_tables():
     except Exception as e:
         print("Table creation skipped:", e)
 
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 @app.on_event("startup")
 def create_initial_admin():
     db: Session = SessionLocal()
     try:
-        # Check if admin already exists
         admin = db.query(models.User).filter(
             models.User.role == models.UserRole.admin
         ).first()
 
-        if not admin:
-            hashed_password = hash_pass(settings.ADMIN_PASSWORD)
+        if not ADMIN_EMAIL or not ADMIN_PASSWORD:
+            print("ADMIN_EMAIL or ADMIN_PASSWORD not set. Admin creation skipped.")
+            return
+        hashed_password = hash_pass(ADMIN_PASSWORD)
 
-            new_admin = models.User(
-                name="Admin",
-                email=settings.ADMIN_EMAIL,
-                password=hashed_password,
-                role=models.UserRole.admin
-            )
+        new_admin = models.User(
+            name="Admin",
+            email=ADMIN_EMAIL,
+            password=hashed_password,
+            role=models.UserRole.admin
+        )
 
-            db.add(new_admin)
-            db.commit()
-            print("Admin user created.")
+        db.add(new_admin)
+        db.commit()
+        print("Admin user created.")
 
     except Exception as e:
         print("Error creating admin:", e)
