@@ -34,37 +34,49 @@ async def ws_track_order(websocket : WebSocket,order_id : int,token : str = Quer
         while True:
             data = await websocket.receive_json()
 
+            print("Received:", data) 
+
             if data.get("type") == "ping":
                 continue
 
             agent_lat = data.get("lat")
             agent_lng = data.get("lng")
 
-            if not agent_lat or not agent_lng:
+            if agent_lat is None or agent_lng is None:
                 continue
+
+            await manager.broadcast_to_order(order_id, {
+                "lat": agent_lat,
+                "lng": agent_lng
+            })
 
             db = SessionLocal()
-            order = db.query(Order).filter(Order.id == order_id).first()
+            try:
+                order = db.query(Order).filter(Order.id == order_id).first()
 
-            if not order:
+                if not order:
+                    continue
+
+                drop_lat = order.drop_lat
+                drop_lng = order.drop_lng
+
+                distance = ((agent_lat - drop_lat)**2 + (agent_lng - drop_lng)**2)**0.5
+
+                print("Distance:", distance)
+
+                if distance < 0.0005 and order.status != "delivered":
+                    order.status = "delivered"
+                    db.commit()
+
+                    print("✅ Delivered!")
+
+                    await manager.broadcast_to_order(order_id, {
+                        "type": "ORDER_UPDATE",
+                        "status": "delivered"
+                    })
+
+            finally:
                 db.close()
-                continue
-
-            drop_lat = order.drop_lat
-            drop_lng = order.drop_lng
-
-            distance = ((agent_lat - drop_lat)**2 + (agent_lng - drop_lng)**2)**0.5
-
-            print("Distance:", distance)
-
-            if distance < 0.0005 and order.status != "delivered":
-                order.status = "delivered"
-                db.commit()
-
-                await manager.broadcast_to_order(order_id, {
-                    "type": "ORDER_UPDATE",
-                    "status": "delivered"
-                })
     except WebSocketDisconnect:
         await manager.disconnect(order_id, websocket)
 
