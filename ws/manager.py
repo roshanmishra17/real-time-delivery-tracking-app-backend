@@ -5,7 +5,7 @@ from fastapi import WebSocket
 
 class WebSocketManager:
     def __init__(self):
-        self.active: Dict[int, list[WebSocket]] = {}
+        self.active: Dict[int, set[WebSocket]] = {}
         self._lock = asyncio.Lock()
     
     async def connect(self,order_id : int,websocket : WebSocket):
