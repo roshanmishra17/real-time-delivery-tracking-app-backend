@@ -4,7 +4,7 @@ from Service.ws_permission import can_track_orders
 from core.jwt_helper import get_user_from_token
 from database import SessionLocal
 from ws.manager import manager
-from models import Order
+from models.models import Order
 router = APIRouter(prefix="/ws", tags=["Test WS"])
 
 @router.websocket("/track/{order_id}")
