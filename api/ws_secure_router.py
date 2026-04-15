@@ -1,6 +1,6 @@
 import asyncio
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
-from RTDT.core.distance import haversine
+from core.distance import haversine
 from Service.ws_permission import can_track_orders
 from core.jwt_helper import get_user_from_token
 from database import SessionLocal
