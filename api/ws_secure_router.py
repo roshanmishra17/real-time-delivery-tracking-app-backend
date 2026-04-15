@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from RTDT.core.distance import haversine
 from Service.ws_permission import can_track_orders
 from core.jwt_helper import get_user_from_token
 from database import SessionLocal
@@ -60,11 +61,11 @@ async def ws_track_order(websocket : WebSocket,order_id : int,token : str = Quer
                 drop_lat = order.drop_lat
                 drop_lng = order.drop_lng
 
-                distance = ((agent_lat - drop_lat)**2 + (agent_lng - drop_lng)**2)**0.5
+                distance = haversine(agent_lat, agent_lng, drop_lat, drop_lng)
 
                 print("Distance:", distance)
 
-                if distance < 1 and order.status != "delivered":
+                if distance < 200 and order.status != "delivered":
                     order.status = "delivered"
                     db.commit()
 
