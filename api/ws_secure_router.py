@@ -64,7 +64,7 @@ async def ws_track_order(websocket : WebSocket,order_id : int,token : str = Quer
 
                 print("Distance:", distance)
 
-                if distance < 0.0005 and order.status != "delivered":
+                if distance < 1 and order.status != "delivered":
                     order.status = "delivered"
                     db.commit()
 
