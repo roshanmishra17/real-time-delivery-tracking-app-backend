@@ -40,7 +40,6 @@ class Order(Base):
 
     status = Column(Enum(OrderStatus), default=OrderStatus.created, nullable=False)
 
-
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     customer = relationship("User", foreign_keys=[customer_id])
