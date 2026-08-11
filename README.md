@@ -106,6 +106,7 @@ Create a `.env` file in the project root with the following values:
 DATABASE_URL=postgresql://user:password@host:port/db
 SECRET_KEY=your_secret_key
 ALGORITHM=HS256
+REDIS_URL=your_redis_url
 ACCESS_TOKEN_TIME=60
 ```
 
